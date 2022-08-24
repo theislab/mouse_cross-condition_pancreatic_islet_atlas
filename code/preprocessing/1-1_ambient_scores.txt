@@ -1,0 +1,6 @@
+# Run script for calculating ambient scores with emptyDrops for each sample file
+while read -r line
+    do  read study sample dir ending dir_cr <<<$line
+    echo $i "study $study" "sample $sample" "dir $dir" "ending $ending" 
+    sbatch $WSCL/mm_pancreas_atlas_rep/code/preprocessing/1-1_ambient_scores.sbatch $dir $ending 
+done <<<  "$(tail -n+2 /lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/raw_file_list.tsv)"
