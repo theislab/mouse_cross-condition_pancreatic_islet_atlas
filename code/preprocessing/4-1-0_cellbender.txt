@@ -1,0 +1,50 @@
+# Code used for runing different steps of cellbender preprocessing: prepare input files (counts, sample metadata), run CellBender, visualise corrected expression
+
+# Prepare files for cellbender - in mtx format
+# activate rpy2_3 env
+#conda activate rpy2_3
+i=1
+while read -r line
+    do  read study dir file cells drops min_count learning_rate <<<$line
+    echo $i "study $study" "dir $dir" "file $file" "cells $cells" "drops $drops" "min_count $min_count" "..."
+    i=$((i+1))
+    nohup python $WSCL/mm_pancreas_atlas_rep/code/preprocessing/4-1-1_toMtx.py --uid $i --folder $dir --file $file --folder_out "$dir""cellbender/" --save_mtx 1 > tomtx$i.out 2> tomtx$i.err &
+done <<<  $(tail -n+2 /lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/cellbender_params_unix.tsv)
+
+# Transform my cellbender params table file to unix compatible format
+cd /lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/
+rpy2_3
+python
+import pandas as pd
+t=pd.read_table('cellbender_params.tsv')
+t.to_csv('cellbender_params_unix.tsv',sep='\t',index=False)
+
+# Run cellbender on slurm and use different FPRs
+# Using while read as above does not work in vcib - it produes single line
+# But  IFS must be reser to read individual lines in variables (just for the read comand, see below)
+## For some files needed to reduce learning rate
+## Use different FPRs
+OLDIFS=$IFS; IFS=$'\n'
+i=1
+for line in $(tail -n+2 /lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/cellbender_params_unix.tsv)
+    do  IFS=$'\t' read study dir file cells drops min_count learning_rate <<<$line
+    echo "$i study $study dir $dir file $file cells $cells drops $drops min_count $min_count learning_rate $learning_rate..."
+    i=$((i+1))
+    sbatch $WSCL/mm_pancreas_atlas_rep/code/preprocessing/4-1-1_cellbender.sbatch $dir $cells $drops $min_count $learning_rate 0.01,0.05,0.1,0.2,0.3,0.5,0.7,0.9
+done 
+IFS=$OLDIFS
+
+# Compare results at different FPRs using UMAPs
+conda activate rpy2_3
+i=1
+while read -r line
+    do  read study dir file cells drops min_count learning_rate <<<$line
+    echo $i "study $study" "dir $dir" "file $file" "..."
+    i=$((i+1))
+    nohup python $WSCL/mm_pancreas_atlas_rep/code/preprocessing/4-1-2_cellbender_plotCorrected.py $i $dir $file > CBfpr$i.out 2> CBfpr$i.err &
+done <<<  $(tail -n+2 /lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/cellbender_params_unix.tsv)
+
+
+
+
+

@@ -1,0 +1,48 @@
+# Run decontX on specified directories
+# See below to decide non delta param
+
+unset FILES
+declare -a FILES     
+
+
+FILES[1]='VSG;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/VSG_PF_WT_cohort/rev7/'
+
+FILES[2]='Fltp_adult;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_fltp_headtail/rev4/'
+
+FILES[3]='Fltp_2y;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islets_aged_fltp_iCre/rev6/'
+
+FILES[4]='embryo;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE132188/rev7/'
+
+FILES[5]='Fltp_P16;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/salinno_project/rev4/'
+
+FILES[6]='STZ;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_glpest_lickert/rev7/'
+
+FILES[7]='NOD;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE144471/'
+
+FILES[8]='NOD_elimination;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE117770/'
+
+FILES[9]='spikein_drug;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE142465/'
+
+conda activate rpy2_3
+
+# Run one from below - fixed or not fixed delta
+
+# Delta not fixed
+out_folder=decontX/
+for i in "${!FILES[@]}"
+do
+  IFS=";" read -r study folder <<< "${FILES[$i]}"
+  echo "i: $i" "study: $study" "folder: $folder"
+  mkdir -p "$folder""$out_folder"
+  nohup python $WSCL/mm_pancreas_atlas_rep/code/preprocessing/4-2_decontX.py "$i" "$folder" > "$folder""$out_folder"decontX_log.out 2> "$folder""$out_folder"decontX_log.err &
+done
+
+# Delta fixed 
+out_folder=decontX_fixed/
+for i in "${!FILES[@]}"
+do
+  IFS=";" read -r study folder <<< "${FILES[$i]}"
+  echo "i: $i" "study: $study" "folder: $folder"
+  mkdir -p "$folder""$out_folder"
+  nohup python $WSCL/mm_pancreas_atlas_rep/code/preprocessing/4-2_decontX.py "$i" "$folder" 1 > "$folder""$out_folder"decontX_log.out 2> "$folder""$out_folder"decontX_log.err &
+done

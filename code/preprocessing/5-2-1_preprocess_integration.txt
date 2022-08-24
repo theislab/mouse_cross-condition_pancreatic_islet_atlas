@@ -1,0 +1,129 @@
+# Call preprocessing for integration on samples of individual datasets with different ambient removal (e.g. without ambient correction or on ambient corrected data, in both cases ambient masking is applied thereafeter)
+#__________________________________________________________________________________
+
+# Preporcessing for masking ambientonly  - uncomment below for ambient set short or ambient set extended
+
+conda activate rpy2_3
+cd $WS
+
+unset FILES
+declare -a FILES     
+
+#FILES[1]='VSG;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/VSG_PF_WT_cohort/rev7/nonref/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/VSG_PF_WT_cohort/rev7/scanpy_AnnData/MUC136*/filtered_feature_bc_matrix.h5ad;0'
+
+#FILES[2]='VSG;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/VSG_PF_WT_cohort/rev7/ref/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/VSG_PF_WT_cohort/rev7/scanpy_AnnData/MUC136*/filtered_feature_bc_matrix.h5ad;1'
+
+FILES[3]='VSG;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/VSG_PF_WT_cohort/rev7/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/VSG_PF_WT_cohort/rev7/scanpy_AnnData/MUC136*/filtered_feature_bc_matrix.h5ad;-1'
+
+FILES[4]='Fltp_adult;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_fltp_headtail/rev4/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_fltp_headtail/rev4/scanpy_AnnData/mouse*/filtered_gene_bc_matrices.h5ad;1'
+
+FILES[5]='Fltp_2y;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islets_aged_fltp_iCre/rev6/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islets_aged_fltp_iCre/rev6/scanpy_AnnData/MUC1397*/filtered_feature_bc_matrix.h5ad;1'
+
+FILES[6]='embryo;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE132188/rev7/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE132188/rev7/scanpy_AnnData/E1*/filtered_feature_bc_matrix.h5ad;0'
+
+FILES[7]='Fltp_P16;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/salinno_project/rev4/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/salinno_project/rev4/scanpy_AnnData/14*/filtered_gene_bc_matrices.h5ad;1'
+
+#FILES[8]='STZ;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_glpest_lickert/rev7/ref/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_glpest_lickert/rev7/scanpy_AnnData/G*/filtered_feature_bc_matrix.h5ad;1'
+
+#FILES[9]='STZ;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_glpest_lickert/rev7/nonref/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_glpest_lickert/rev7/scanpy_AnnData/G*/filtered_feature_bc_matrix.h5ad;0'
+
+FILES[10]='STZ;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_glpest_lickert/rev7/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_glpest_lickert/rev7/scanpy_AnnData/G*/filtered_feature_bc_matrix.h5ad;-1'
+
+FILES[11]='NOD;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE144471/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE144471/scanpy_AnnData/SRR1098509*/filtered_feature_bc_matrix.h5ad;0'
+
+FILES[12]='NOD_elimination;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE117770/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE117770/scanpy_AnnData/SRR7610*/filtered_feature_bc_matrix.h5ad;0'
+
+FILES[13]='spikein_drug;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE142465/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE142465/scanpy_AnnData/SRR107515*/filtered_feature_bc_matrix.h5ad;0'
+
+FILES[14]='inceptor;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/inceptor/citeseq_mouse_islets_DK/expression/data_annotated.h5ad;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/inceptor/citeseq_mouse_islets_DK/*/expression/filtered_feature_bc_matrix.h5ad;-1'
+
+
+
+for i in "${!FILES[@]}"
+do
+  IFS=";" read -r study file path_raw for_ref <<< "${FILES[$i]}"
+  echo "i: $i" "study: $study" "file: $file" "path_raw: $path_raw" "for ref: $for_ref"
+  # Un/re-comment for ambient (smaller ambient set) or ambientExtended (larger ambient set)
+  nohup python $WSCL/mm_pancreas_atlas_rep/code/preprocessing/5_preprocess_integration.py "$i" "$study" "$file" "$path_raw" "$for_ref" > pp$i.out 2> pp$i.err &
+  #nohup python $WSCL/mm_pancreas_atlas_rep/code/preprocessing/5-2-1_preprocess_integration_ambientExtended.py "$i" "$study" "$file" "$path_raw" "$for_ref" > pp$i.out 2> pp$i.err &
+done
+
+
+# ---------------------------------------------------------
+# Preprocessing for decontX data
+# See below for selecting which correction strength do process for
+
+unset FILES
+declare -a FILES
+
+file_name="data_decontX.h5ad"
+# Un/re-comment to run on decontX with fixed/not correction param
+folder_ending="decontX_fixed/"
+#folder_ending="decontX/"
+file_integrationpp_nonabientpp="data_normlisedForIntegration.h5ad"
+
+FILES[1]='VSG;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/VSG_PF_WT_cohort/rev7/'
+
+FILES[2]='Fltp_adult;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_fltp_headtail/rev4/'
+
+FILES[3]='Fltp_2y;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islets_aged_fltp_iCre/rev6/'
+
+FILES[4]='embryo;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE132188/rev7/'
+
+FILES[5]='Fltp_P16;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/salinno_project/rev4/'
+
+FILES[6]='STZ;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_glpest_lickert/rev7/'
+
+FILES[7]='NOD;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE144471/'
+
+FILES[8]='NOD_elimination;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE117770/'
+
+FILES[9]='spikein_drug;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE142465/'
+
+
+for i in "${!FILES[@]}"
+do
+  IFS=";" read -r study folder <<< "${FILES[$i]}"
+  echo i: $i study: $study folder: "$folder""$folder_ending"  file_name "$file_name" file_integrationpp_nonambientpp "$folder""$file_integrationpp_nonabientpp"
+  nohup python $WSCL/mm_pancreas_atlas_rep/code/preprocessing/5-2-1_preprocess_integration_decontX.py "$i" "$study" "$folder""$folder_ending" "$file_name" "$folder""$file_integrationpp_nonabientpp" > ppdx$i.out 2> ppdx$i.err &
+done
+
+#_____________________________________________
+# Proeporcessing for SoupX ambient corrected data
+
+conda activate rpy2_3
+i=0   
+for rho in 0 005 01;
+    do
+    unset FILES
+    declare -a FILES  
+   
+    FILES[1]='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/VSG_PF_WT_cohort/rev7/;scanpy_AnnData/MUC136*/'
+
+    FILES[2]='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_fltp_headtail/rev4/;scanpy_AnnData/mouse*/'
+    
+    FILES[3]='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islets_aged_fltp_iCre/rev6/;scanpy_AnnData/MUC1397*/'
+
+    FILES[4]='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE132188/rev7/;scanpy_AnnData/E1*/'
+
+    FILES[5]='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/salinno_project/rev4/;scanpy_AnnData/14*/'
+
+    FILES[6]='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_glpest_lickert/rev7/;scanpy_AnnData/G*/'
+
+    FILES[7]='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE144471/;scanpy_AnnData/SRR1098509*/'
+
+    FILES[8]='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE117770/;scanpy_AnnData/SRR7610*/'
+
+    FILES[9]='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE142465/;scanpy_AnnData/SRR107515*/'
+
+    for k in "${!FILES[@]}"
+    do
+      i=$((i+1))
+      val="${FILES[$k]}"
+      val="${val}SoupX/SoupX_filtered_rhoadd${rho}.h5ad;SoupX_rhoadd${rho}"
+      IFS=";" read -r path path_ext_corr  pp <<< "$val"
+      echo "i: $i" "k: $k"  "path $path" "path_ext_corr: $path_ext_corr" "pp: $pp"
+      nohup python $WSCL/mm_pancreas_atlas_rep/code/preprocessing/5-2-1_preprocess_integration_SoupX.py "$i" "$path" "$path_ext_corr" "$pp" > ppSoupX$i.out 2> ppSoupX$i.err &
+    done
+
+done

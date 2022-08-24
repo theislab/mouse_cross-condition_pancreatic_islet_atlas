@@ -1,0 +1,32 @@
+conda activate rpy2_3
+
+unset FILES
+declare -a FILES     
+
+FILES[3]='VSG;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/VSG_PF_WT_cohort/rev7/data_normlisedForIntegration.h5ad;/lustre/groups/ml01/projects/2020_pancreas_karin.hrovatin/data/pancreas/scRNA/VSG_PF_WT_cohort/rev7/cellranger/*/count_matrices/filtered_feature_bc_matrix/features.tsv'
+
+FILES[4]='Fltp_adult;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_fltp_headtail/rev4/data_normlisedForIntegration.h5ad;/lustre/groups/ml01/projects/2020_pancreas_karin.hrovatin/data/pancreas/scRNA/islet_fltp_headtail/rev4/cellranger/*/count_matrices/filtered_gene_bc_matrices/*/genes.tsv'
+
+FILES[5]='Fltp_2y;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islets_aged_fltp_iCre/rev6/data_normlisedForIntegration.h5ad;/lustre/groups/ml01/projects/2020_pancreas_karin.hrovatin/data/pancreas/scRNA/islets_aged_fltp_iCre/rev6/cellranger/*/count_matrices/filtered_feature_bc_matrix/features.tsv'
+
+FILES[6]='embryo;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE132188/rev7/data_normlisedForIntegration.h5ad;/lustre/groups/ml01/projects/2020_pancreas_karin.hrovatin/data/pancreas/scRNA/GSE132188/rev7/cellranger/*/count_matrices/filtered_feature_bc_matrix/features.tsv'
+
+FILES[7]='Fltp_P16;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/salinno_project/rev4/data_normlisedForIntegration.h5ad;/lustre/groups/ml01/projects/2020_pancreas_karin.hrovatin/data/pancreas/scRNA/salinno_project/rev4/cellranger/*/count_matrices/filtered_gene_bc_matrices/mm10_mTmG_ensrel94/genes.tsv'
+
+FILES[10]='STZ;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/islet_glpest_lickert/rev7/data_normlisedForIntegration.h5ad;/lustre/groups/ml01/projects/2020_pancreas_karin.hrovatin/data/pancreas/scRNA/islet_glpest_lickert/rev7/cellranger/*/count_matrices/filtered_feature_bc_matrix/features.tsv'
+
+FILES[11]='NOD;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE144471/data_normlisedForIntegration.h5ad;/lustre/groups/ml01/projects/2020_pancreas_karin.hrovatin/data/pancreas/scRNA/GSE144471/cellranger/*/count_matrices/filtered_feature_bc_matrix/features.tsv'
+
+FILES[12]='NOD_elimination;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE117770/data_normlisedForIntegration.h5ad;/lustre/groups/ml01/projects/2020_pancreas_karin.hrovatin/data/pancreas/scRNA/GSE117770/cellranger/*/count_matrices/filtered_feature_bc_matrix/features.tsv'
+
+FILES[13]='spikein_drug;/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/GSE142465/data_normlisedForIntegration.h5ad;/lustre/groups/ml01/projects/2020_pancreas_karin.hrovatin/data/pancreas/scRNA/GSE142465/cellranger/*/count_matrices/filtered_feature_bc_matrix/features.tsv'
+
+
+for i in "${!FILES[@]}"
+do
+  IFS=";" read -r study file file_eid <<< "${FILES[$i]}"
+  echo "i: $i" "study: $study" "file: $file" "file_eid: $file_eid"
+  #ls $file
+  #ls $file_eid
+  nohup python $WSCL/mm_pancreas_atlas_rep/code/preprocessing/P1.4_add_EID_integration.py -f "$file" -fe "$file_eid" > add_eid$i.out 2> add_eid$i.err &
+done

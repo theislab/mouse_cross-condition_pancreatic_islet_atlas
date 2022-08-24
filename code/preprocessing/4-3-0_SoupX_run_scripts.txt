@@ -1,0 +1,36 @@
+# Helper code for runing SoupX related scripts
+#_________________________________________
+
+
+# Get UMAPs and clusters from filtered raw files for soupX
+i=1
+while read -r line
+    do  read study sample dir ending <<<$line
+    echo $i "study $study" "sample $sample" "dir $dir" "ending $ending" 
+    sbatch $WSCL/mm_pancreas_atlas_rep/code/preprocessing/4-3-1_analyse_filtered_gene_matrices.sbatch $i $ending $dir 
+    i=$((i+1))
+done <<<  "$(tail -n+2 /lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/raw_file_list.tsv)"
+
+#_________________________________
+
+# Run SoupX
+while read -r line
+    do  read study sample dir ending <<<$line
+    echo $i "study $study" "sample $sample" "dir $dir" "ending $ending" 
+    sbatch $WSCL/mm_pancreas_atlas_rep/code/preprocessing/4-3-2_SoupX.sbatch $ending $dir 
+done <<<  "$(tail -n+2 /lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/raw_file_list.tsv)"
+
+#______________________________________
+
+# Plot ambient genes after correction
+
+conda activate rpy2_3
+
+i=1
+while read -r line
+    do  read study sample dir ending <<<$line
+    echo $i "study $study" "sample $sample" "dir $dir" "ending $ending" 
+    i=$((i+1))
+    nohup python $WSCL/mm_pancreas_atlas_rep/code/preprocessing/4-3-3_plot_SoupX_ambient.py $i $ending $dir > SXrhoPlot$i.out 2> SXrhoPlot$i.err &
+done <<<  $(tail -n+2 /lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/raw_file_list.tsv)
+

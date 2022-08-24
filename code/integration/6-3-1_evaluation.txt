@@ -1,0 +1,109 @@
+# Evaluation of integration with scIB metrics
+
+# Chose integration directories to evaluate (first argument in the semicolon-spearated list of each element in the FILES variable below). As integration files contain timestamps re-running this would require adapting file names if the integration evaluation would be re-run on reproduced integration as timestamps would differ
+
+script_dir=$WSCL/mm_pancreas_atlas_rep/code/integration/
+
+#___________________________________________
+# Evaluation of all cell types integration
+
+unset FILES
+declare -a FILES     
+
+# scArches; ambientMasked; quick; 3 re-runs
+FILES[1]='combined/scArches/integrate_combine_individual/run_scArches1603792372.695119/;data_normlisedForIntegration.h5ad;0'
+FILES[2]='combined/scArches/integrate_combine_individual/run_scArches1649916019.148133/;data_normlisedForIntegration.h5ad;0'
+FILES[3]='combined/scArches/integrate_combine_individual/run_scArches1650008190.874977/;data_normlisedForIntegration.h5ad;0'
+
+# scArches; ambientMasked; slow; 3 re-runs
+FILES[4]='combined/scArches/integrate_combine_individual/run_scArches1605997831.626417/;data_normlisedForIntegration.h5ad;0'
+FILES[5]='combined/scArches/integrate_combine_individual/run_scArches1605997831.626664/;data_normlisedForIntegration.h5ad;0'
+FILES[6]='combined/scArches/integrate_combine_individual/run_scArches1606480383.88613/;data_normlisedForIntegration.h5ad;0'
+
+# scArches; ambientMaskedExtended; slow; 3 re-runs
+FILES[7]='combined/scArches/integrate_combine_individual/run_scArches1605798604.647761/;data_normlisedForIntegration.h5ad;0'
+FILES[8]='combined/scArches/integrate_combine_individual/run_scArches1606061035.453162/;data_normlisedForIntegration.h5ad;0'
+FILES[9]='combined/scArches/integrate_combine_individual/run_scArches1606061035.453407/;data_normlisedForIntegration.h5ad;0'
+
+# scArches; ambientMasked+decontX; slow
+FILES[5]='combined/scArches/integrate_combine_individual/run_scArches1603881821.939477/;data_normlisedForIntegration.h5ad;0'
+
+# scArches; ambientMasked+decontX_fixed; slow
+FILES[7]='combined/scArches/integrate_combine_individual/run_scArches1604502149.078628/;data_normlisedForIntegration.h5ad;0'
+
+# scArches; ambientMasked+SoupX_rhoadd0; slow
+FILES[17]='combined/scArches/integrate_combine_individual/run_scArches1612129003.819243/;data_normlisedForIntegration.h5ad;0'
+
+# scArches; ambientMasked+SoupX_rhoadd005; slow
+FILES[18]='combined/scArches/integrate_combine_individual/run_scArches1612129003.818745/;data_normlisedForIntegration.h5ad;0'
+
+# scArches; ambientMasked+SoupX_rhoadd01; slow
+FILES[19]='combined/scArches/integrate_combine_individual/run_scArches1612129003.818814/;data_normlisedForIntegration.h5ad;0'
+
+# scArches; ambientMasked+SoupX_rhoadd0; quick; 3 re-runs
+FILES[20]='combined/scArches/integrate_combine_individual/run_scArches1612217039.745045/;data_normlisedForIntegration.h5ad;0'
+FILES[26]='combined/scArches/integrate_combine_individual/run_scArches1649794207.047576/;data_normlisedForIntegration.h5ad;0'
+FILES[27]='combined/scArches/integrate_combine_individual/run_scArches1649618335.163001/;data_normlisedForIntegration.h5ad;0'
+
+# scArches; ambientMasked+SoupX_rhoadd005; quick
+FILES[21]='combined/scArches/integrate_combine_individual/run_scArches1612217039.744893/;data_normlisedForIntegration.h5ad;0'
+
+# scArches; ambientMasked+SoupX_rhoadd01; quick
+FILES[22]='combined/scArches/integrate_combine_individual/run_scArches1612217039.744912/;data_normlisedForIntegration.h5ad;0'
+
+# scVI; ambientMasked
+FILES[1]='combined/scVI/runs/1603814626.572086_SB0/;data_normlisedForIntegration.h5ad;0'
+
+# scVI; ambientMasked+decontX
+FILES[2]='combined/scVI/runs/1603814626.761494_SB0/;data_normlisedForIntegration.h5ad;0'
+
+# scVI; ambientMasked+decontX_fixed
+FILES[6]='combined/scVI/runs/1604500510.973771_SB0/;data_normlisedForIntegration.h5ad;0'
+
+# scVI; ambientMasked+SoupX_rhoadd0
+FILES[15]='combined/scVI/runs/1612129492.366433_SB0/;data_normlisedForIntegration.h5ad;0'
+
+# scVI; ambientMasked+SoupX_rhoadd005
+FILES[14]='combined/scVI/runs/1612129479.815399_SB0/;data_normlisedForIntegration.h5ad;0'
+
+# scVI; ambientMasked+SoupX_rhoadd01
+FILES[16]='combined/scVI/runs/1612129526.764645_SB0/;data_normlisedForIntegration.h5ad;0'
+
+# Run evaluation for each integration
+for i in "${!FILES[@]}"
+do
+  IFS=";" read -r run_dir raw_file split_refnonref <<< "${FILES[$i]}"
+  echo i $i run_dir $run_dir raw_file $raw_file split_refnonref $split_refnonref
+  sbatch "$script_dir"6-3-1_evaluation.sbatch $i $run_dir $raw_file $split_refnonref 1
+done
+
+
+#____________________________
+# Evaluation of beta cell embedding from integration of beta only and of all cells (from the selected integration)
+
+# All beta cells (including for initially unannotated samples) extracted from re-annotation on 
+# integration of all cell types (selected integration from the ones above)
+cell_path='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/beta_cell_names.pkl'
+data_file="data_normlisedForIntegration.h5ad"
+folder_integration="combined/scArches/integrate_combine_individual/"
+out_folder='beta_integrated/'
+cell_group='cell_subtype'
+
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 1 "$folder_integration""run_scArches1603792372.695119/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 2 "$folder_integration""run_scArches1612798260.979096/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 3 "$folder_integration""run_scArches1612875550.182689/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 4 "$folder_integration""run_scArches1612875550.182888/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 5 "$folder_integration""run_scArches1613645086.694957/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 6 "$folder_integration""run_scArches1613645086.693856/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 7 "$folder_integration""run_scArches1613645086.693854/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 8 "$folder_integration""run_scArches1613653844.206358/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 9 "$folder_integration""run_scArches1613748252.804456/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 10 "$folder_integration""run_scArches1613748425.51651/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 11 "$folder_integration""run_scArches1613748252.804646/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 12 "$folder_integration""run_scArches1613744258.263764/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 13 "$folder_integration""run_scArches1613744258.219381/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 14 "$folder_integration""run_scArches1613805919.586668/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 15 "$folder_integration""run_scArches1613806421.648875/" $data_file 0 $cell_path $out_folder $cell_group
+sbatch "$script_dir"6-3-1_evaluation_subset.sbatch 16 "$folder_integration""run_scArches1613806421.648952/" $data_file 0 $cell_path $out_folder $cell_group
+
+

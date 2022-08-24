@@ -1,0 +1,87 @@
+#### Combine individual datasets
+# Run with different params
+# For the params of interest we re-ran integration mutliple times to observe variation due to random initialisation - this is here done by runing the same code in a loop multiple times
+
+conda activate py3.6-scarches
+
+pyscript=$WSCL/mm_pancreas_atlas_rep/code/integration/scArches/6-2-3_scArches_combineIndividual_script.py
+
+# No ambient correction - masking
+# Slow training - multiple re-runs
+a=1
+for j in 1 2 3
+ do
+ i="$a.$j"
+ nohup python $pyscript $i data_normlisedForIntegration.h5ad > scarches$i.out 2> scarches$i.err &
+ done
+
+# No ambient correction - masking
+# Quick training - multiple re-runs
+a=7
+for j in 1 2 3
+ do
+ i="$a.$j"
+  nohup python $pyscript $i data_normlisedForIntegration.h5ad None None None None None 1 > scarches$i.out 2> scarches$i.err &
+ done
+ 
+# No ambient correction - masking of extended ambient genes; slow training
+a=2
+for j in 1 2 3
+ do
+ i="$a.$j"
+ nohup python $pyscript $i data_normlisedForIntegration_ambientExtended.h5ad > scarches$i.out 2> scarches$i.err &
+ done
+
+# Decontx ambient correction; slow training
+i=3
+nohup python $pyscript $i decontX/data_decontX_normlisedForIntegration.h5ad > scarches$i.out 2> scarches$i.err &
+
+# DecontX fixed; slow training
+i=5
+nohup python $pyscript $i decontX_fixed/data_decontX_normlisedForIntegration.h5ad > scarches$i.out 2> scarches$i.err &
+
+# SoupX with different added ambience; slow or quick training
+i=60
+for rho_add in 0 005 01
+for quick in 0 1
+do
+file=data_SoupX_rhoadd"$rho_add"_normlisedForIntegration.h5ad
+echo "i: $i file $file quick $quick"
+nohup python $pyscript $i "$file" None None None None None $quick > scarches$i.out 2> scarches$i.err &
+i=$((i+1))
+done
+done
+
+# SoupX without addition to rho, quick training, multiple re-runs
+a=8
+rho_add=0
+for j in 1 2 # One re-run already done above
+ do
+ i="$a.$j"
+ nohup python $pyscript $i data_SoupX_rhoadd0_normlisedForIntegration.h5ad None None None None None 1 > scarches$i.out 2> scarches$i.err &
+ done
+ 
+#___________________________________________________________________________
+# Integration of only beta cells
+# Try integrations with different alpha params to balance batch correction and bio preservation
+
+# Alpha as for all-cell integration
+i=4
+nohup python $pyscript $i data_normlisedForIntegration.h5ad None None "/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/beta_cell_names.pkl" None None 1 > scarches$i.out 2> scarches$i.err &
+# Change alpha
+i=4.1
+nohup python $pyscript $i data_normlisedForIntegration.h5ad None None "/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/beta_cell_names.pkl" 0.8 None 1 > scarches$i.out 2> scarches$i.err &
+i=4.2
+nohup python $pyscript $i data_normlisedForIntegration.h5ad None None "/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/beta_cell_names.pkl" 0.9 None 1 > scarches$i.out 2> scarches$i.err &
+i=4.3
+nohup python $pyscript $i data_normlisedForIntegration.h5ad None None "/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/beta_cell_names.pkl" 0.5 None 1 > scarches$i.out 2> scarches$i.err &
+i=4.4
+nohup python $pyscript $i data_normlisedForIntegration.h5ad None None "/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/beta_cell_names.pkl" 0.2 None 1 > scarches$i.out 2> scarches$i.err &
+i=4.5
+nohup python $pyscript $i data_normlisedForIntegration.h5ad None None "/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/beta_cell_names.pkl" 0.1 None 1 > scarches$i.out 2> scarches$i.err &
+i=4.6
+nohup python $pyscript $i data_normlisedForIntegration.h5ad None None "/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/beta_cell_names.pkl" 0.01 None 1 > scarches$i.out 2> scarches$i.err &
+i=4.7
+nohup python $pyscript $i data_normlisedForIntegration.h5ad None None "/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/beta_cell_names.pkl" 0.4 None 1 > scarches$i.out 2> scarches$i.err &
+i=4.8
+nohup python $pyscript $i data_normlisedForIntegration.h5ad None None "/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/beta_cell_names.pkl" 0.3 None 1 > scarches$i.out 2> scarches$i.err &
