@@ -63,6 +63,7 @@ latent_adata.obs_names=[idx.replace('-ref','').replace('-nonref','').replace('_r
 latent_adata
 
 # %%
+# Requires table from the gene annotation comaprison notebook
 genes_anno=pd.read_table('/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/gene_lists/genomeAnno_ORG'+\
     'mus_musculus_V103.tsv',index_col=0)
 
@@ -72,6 +73,7 @@ genes_anno['gene_symbol_original_matched']=genes_anno[
 ].fillna('NA').apply(lambda x: x.unique()[0] if x.nunique()==1 else np.nan, axis=1)
 
 # %%
+# N genes with matched symbols
 (~genes_anno['gene_symbol_original_matched'].isna()).sum()
 
 # %%
@@ -222,7 +224,7 @@ print('N genes used for integration in created rawnorm adata:',
 adata_full.var.gene_symbol_original_matched[adata_full.var.used_integration].isna().sum()
 
 # %% [markdown]
-# #### Save rawnormalised object
+# #### Save 
 
 # %%
 adata_full
@@ -235,3 +237,9 @@ adata_full.write(path_save+'data_integrated_annotated.h5ad')
 
 # %%
 adata_rawnorm.write(path_save+'data_rawnorm_integrated_annotated.h5ad')
+
+# %%
+# Save EID-gene symbol mapping for integration model
+adata_full.var['gene_symbol_original_matched'
+              ][adata_full.var['used_integration']].rename('gene_symbol').to_csv(
+    path_latent+'integrationGenes_mapEidSymbol.tsv',sep='\t')
