@@ -1,0 +1,11 @@
+hvg_n	z_dimension	architecture	beta	alpha	loss_fn	n_epochs	batch_size
+2000	15	128_128_128	0	0.96	sse	150	128
+2000	15	128_128_128	0	0.97	sse	150	128
+2000	15	128_128_128	0	0.98	sse	150	128
+2000	15	128_128_128	0	0.99	sse	150	128
+2000	15	128_128_128	0	1	sse	150	128
+multilevel_target2000	15	128_128_128	0	0.96	sse	150	128
+multilevel_target2000	15	128_128_128	0	0.97	sse	150	128
+multilevel_target2000	15	128_128_128	0	0.98	sse	150	128
+multilevel_target2000	15	128_128_128	0	0.99	sse	150	128
+multilevel_target2000	15	128_128_128	0	1	sse	150	128
