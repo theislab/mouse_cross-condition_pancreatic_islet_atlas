@@ -4,7 +4,7 @@
 # Preporcessing for masking ambientonly  - uncomment below for ambient set short or ambient set extended
 
 conda activate rpy2_3
-cd $WS
+cd $WSL
 
 unset FILES
 declare -a FILES     

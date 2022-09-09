@@ -20,4 +20,4 @@ conda activate rpy2_3
 # $6 - folder name in which to save results, placed within run folder
 # $7 - obs col used as cell group
 echo $1 $2 $3 $4 $5 $6 $7
-python "$WSC""diabetes_analysis/integration/6-3-1_evaluation_subset_script.py" "$1" "$2" "$3" "$4" "$5" "$6" "$7" "1"
+python "$WSCL""diabetes_analysis/integration/6-3-1_evaluation_subset_script.py" "$1" "$2" "$3" "$4" "$5" "$6" "$7" "1"

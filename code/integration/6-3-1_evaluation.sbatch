@@ -17,4 +17,4 @@ conda activate rpy2_3
 # $3 - raw_file - counts used for integration evaluation
 # $4 - split_refnonref - was VSG/STZ split to ref/nonref in integration
 echo $1 $2 $3 $4
-python "$WSC"diabetes_analysis/integration/6-3-1_evaluation_script.py $1 $2 $3 $4 1
+python "$WSCL"diabetes_analysis/integration/6-3-1_evaluation_script.py $1 $2 $3 $4 1

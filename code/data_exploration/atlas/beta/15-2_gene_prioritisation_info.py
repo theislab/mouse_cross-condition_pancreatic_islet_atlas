@@ -54,7 +54,7 @@ import logging
 rpy2.rinterface_lib.callbacks.logger.setLevel(logging.ERROR)
 
 ro.r('library("hypeR")')
-ro.r("source(paste(Sys.getenv('WSC'),'diabetes_analysis/data_exploration/','helper_hypeR.R',sep=''))")
+ro.r("source(paste(Sys.getenv('WSCL'),'diabetes_analysis/data_exploration/','helper_hypeR.R',sep=''))")
 
 # %%
 path_data='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/'

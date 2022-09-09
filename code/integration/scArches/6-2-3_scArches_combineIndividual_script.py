@@ -49,6 +49,7 @@ data=[('Fltp_2y','/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scR
 
 # %%
 if False:
+    # For testing
     UID3='a'
     input_file_name='data_normlisedForIntegration.h5ad'
     path_subset='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/beta_cell_names.pkl'

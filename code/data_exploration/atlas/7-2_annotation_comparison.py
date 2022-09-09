@@ -424,14 +424,14 @@ sorted(adata.obs['pre_cell_type_unified'].unique())
 
 # %%
 # Save
-if False:
-    h.update_adata(adata_new=adata,path=path_data+'data_integrated_analysed.h5ad',
-                   add=[
-                       ('obs',True,'cell_type_parsed','cell_type_parsed'),
-                       ('obs',True,'pre_cell_type_unified','pre_cell_type_unified'),
-                       ('obs',True,'pre_cell_type_original','pre_cell_type_original')
-                   ],
-                   rm=None,unique_id2=None,io_copy=False)
+
+h.update_adata(adata_new=adata,path=path_data+'data_integrated_analysed.h5ad',
+               add=[
+                   ('obs',True,'cell_type_parsed','cell_type_parsed'),
+                   ('obs',True,'pre_cell_type_unified','pre_cell_type_unified'),
+                   ('obs',True,'pre_cell_type_original','pre_cell_type_original')
+               ],
+               rm=None,unique_id2=None,io_copy=False)
 
 # %% [markdown]
 # ### Compare re-annotation and previous annotations
@@ -484,7 +484,7 @@ adata.uns['pre_cell_type_original_colors']=[
 
 # %%
 # Save color palete for cts
-if False:
+if True:
     h.update_adata(adata_new=adata,path=path_data+'data_integrated_analysed.h5ad',
                add=[
                   ('uns',True,'cell_type_integrated_v1_colors','cell_type_integrated_v1_colors'),
@@ -562,7 +562,7 @@ print(subset.sum())
 # %%
 # Save lowq assignment
 adata.obs['low_q']=subset
-if False:
+if True:
     h.update_adata(adata_new=adata,path=path_data+'data_integrated_analysed.h5ad',
                add=[
                   ('obs',True,'low_q','low_q'),

@@ -59,7 +59,7 @@ import helper as h
 
 # %%
 ro.r('library("hypeR")')
-ro.r("source(paste(Sys.getenv('WSC'),'diabetes_analysis/data_exploration/','helper_hypeR.R',sep=''))")
+ro.r("source(paste(Sys.getenv('WSCL'),'diabetes_analysis/data_exploration/','helper_hypeR.R',sep=''))")
 ro.r('library(pvclust)')
 
 # %%
