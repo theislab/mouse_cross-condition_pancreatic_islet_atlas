@@ -921,13 +921,15 @@ def get_symbols(eids:list):
     symbols=pd.DataFrame(symbols)
     # If missing add symbols from adata (matched across studies)
     # (Some genes not matching across studies thus nan)
+    var_eids=set(var.index)
     symbols['gene_symbol']=symbols.apply(
         lambda x: x['gene_symbol'] if  x['gene_symbol']!='nan'
-            else var.loc[x.name,'gene_symbol_original_matched'],axis=1)
+            else var.loc[x.name,'gene_symbol_original_matched'] 
+                 if x.name in var_eids else 'nan',axis=1)
     # If still missing add symbol from original study (not all studies have all genes)
     symbols['gene_symbol']=symbols.apply(
         lambda x: x['gene_symbol'] if  x['gene_symbol']!='nan'
-        else [g for g in gene_names_df.loc['ENSMUSG00000117790',
+        else [g for g in gene_names_df.loc[x.name,
                       [c for c in gene_names_df.columns if 'gene_symbol_' in c]].unique()
                  if g!='nan'][0],axis=1)
     return symbols['gene_symbol']

@@ -321,8 +321,11 @@ plt.savefig(path_fig+'heatmap_beta_diabetesSharedDE_clFineDInterDataset.png',
 # Same as above, but with marked gene names
 
 # %%
-# Add to R expression 
-ro.globalenv['x_ordered']=x.loc[categories,gene_list]
+# Add to R expression  and studies order
+x_plot=x.loc[categories,gene_list].copy()
+studies = [i.split('(')[1].split(')')[0] for i in x_plot.index]
+ro.globalenv['x_ordered']=x_plot
+ro.globalenv['studies']=studies
 
 # %%
 # Gene name anno for R
@@ -349,37 +352,68 @@ ro.globalenv['directions_anno']=pd.DataFrame(directions).T[gene_list]
 # directions_anno<-factor(directions_anno,levels = c('down','up'))
 # ha_col = columnAnnotation(
 #     genes=anno_mark(at = genes_show_idx, labels = genes_show),
-#     direction=directions_anno,
-#     col = list(direction = setNames( c("#8a9e59", "#c97fac"),c('down','up'))),
+#     direction = anno_block(gp = gpar(fill = c("#8a9e59", "#c97fac"), col='white'), 
+#                            labels = c('down','up'),
+#                            labels_gp = gpar(col = "white")),
 #     annotation_name_side = "left"
 # )
 #
 
+# %%
+# Colors for study/model anno
+study_cmap=dict(
+    zip(adata_rn_b.uns['study_parsed_order'],adata_rn_b.uns['study_parsed_colors']))
+ro.globalenv['study_colors']=[study_cmap[s] for s  in list(dict.fromkeys(studies))]
+ro.globalenv['study_order']=[s for s  in list(dict.fromkeys(studies))]
+ro.globalenv['models']=[s.replace('8-16w','') for s  in list(dict.fromkeys(studies))]
+
+# %% language="R"
+# # Study/model anno
+# row_anno = rowAnnotation(dataset = anno_block(
+#         gp = gpar(fill = unlist(study_colors), col='white'),
+#         labels = models, 
+#         labels_gp = gpar(col = "white")))
+# studies_anno<-factor(as.vector(unlist(studies)),levels = unlist(study_order))
+
 # %% magic_args="-w 800 -h 300 " language="R"
+# # plot heatmap
 # h<-Heatmap(x_ordered,col=viridis(256),
 #        cluster_columns = FALSE, cluster_rows = FALSE,
 #        show_column_names = FALSE, show_row_names = TRUE,
 #        row_title ="cell clusters\n(per dataset)",
 #        top_annotation=ha_col,
+#        left_annotation=row_anno,
+#        column_split =as.vector(unlist(directions_anno)),
+#        column_title = NULL,
+#        row_split = studies_anno,
 #        row_names_side = "left",
-#        heatmap_legend_param = list( title = "relative\nmean\nexpression\nper dataset\n"),
-#        row_gap = unit(0, "mm"),
+#        heatmap_legend_param = list( title = "relative\nmean\nexpression\nper dataset\n",
+#                                    title_gp=gpar( fontsize = 12),
+#                                    labels_gp = gpar( fontsize = 12)),
+#        row_gap = unit(1, "mm"),
 #        width= unit(15, "cm"), height= unit(4.5, "cm"),
 #        show_row_dend = FALSE, 
 #        )
 # draw(h)
 
 # %% magic_args="-i path_fig" language="R"
+# # Save heatmap
 # pdf(file=paste0(path_fig,"heatmap_beta_diabetesSharedDE_clFineDInterDataset_annotated.pdf"), 
-#     width=9.7, height=3)
+#     width=9.7, height=3.3)
 # h<-Heatmap(x_ordered,col=viridis(256),
 #        cluster_columns = FALSE, cluster_rows = FALSE,
 #        show_column_names = FALSE, show_row_names = TRUE,
 #        row_title ="cell clusters\n(per dataset)",
 #        top_annotation=ha_col,
+#        left_annotation=row_anno,
+#        column_split =as.vector(unlist(directions_anno)),
+#        column_title = NULL,
+#        row_split = studies_anno,
 #        row_names_side = "left",
-#        heatmap_legend_param = list( title = "relative\nmean\nexpression\nper dataset\n"),
-#        row_gap = unit(0, "mm"),
+#        heatmap_legend_param = list( title = "relative\nmean\nexpression\nper dataset\n",
+#                                    title_gp=gpar( fontsize = 12),
+#                                    labels_gp = gpar( fontsize = 12)),
+#        row_gap = unit(1, "mm"),
 #        width= unit(15, "cm"), height= unit(4.5, "cm"),
 #        show_row_dend = FALSE, 
 #        )

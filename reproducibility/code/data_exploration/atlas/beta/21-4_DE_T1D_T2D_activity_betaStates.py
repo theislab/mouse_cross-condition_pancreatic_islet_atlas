@@ -34,6 +34,22 @@ import importlib
 importlib.reload(he)
 import helper as he
 
+import rpy2.robjects as ro
+from rpy2.robjects import pandas2ri
+pandas2ri.activate()
+# %load_ext rpy2.ipython
+
+import rpy2.rinterface_lib.callbacks
+import logging
+rpy2.rinterface_lib.callbacks.logger.setLevel(logging.ERROR)
+
+from rpy2.robjects.packages import importr
+grdevices = importr('grDevices')
+
+# %% language="R"
+# library('ComplexHeatmap')
+# library(viridis)
+
 # %%
 path_data='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/'
 path_de='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/de/'
@@ -70,13 +86,6 @@ for td,summary in [('NOD',summary_t1),('db/db+mSTZ',summary_t2)]:
                          score_name=score_name, use_raw=False)
         adata_rn_b.obs[score_name+'_scaled']=minmax_scale(adata_rn_b.obs[score_name])
 
-# %%
-# heatmap Col colors for type of gene group
-cmap={'NOD_up':'#656F02','NOD_down':'#B5CE76',
-      'db/db+mSTZ_up':'#9A008C','db/db+mSTZ_down':'#F79DD4'}
-col_colors=pd.Series([cmap['_'.join(c.split('_')[:-1])] for c in x.columns],
-                     index=x.columns)
-
 # %% [markdown]
 # Heatmap on fine beta cell states
 
@@ -98,13 +107,22 @@ x.columns=[c.replace('gene_score_cluster_','') for c in  x.columns]
 # Order 
 # Order columns by type of DE first before by expression pattern - UNUSED
 col_order=[]
-for de in ['NOD_down','NOD_up','db/db+mSTZ_down','db/db+mSTZ_up']:
+de_groups_order=['NOD_down','NOD_up','db/db+mSTZ_down','db/db+mSTZ_up']
+for de in de_groups_order:
     cols=np.array([c for c in x.columns if c.startswith(de)])
     #if len(cols)>2:
     #    cols=cols[he.opt_order( x[cols].T, metric='correlation',  method='ward')]
     col_order.extend(cols)
 x=x.loc[:,col_order]
 #x=x.loc[x.index[he.opt_order(x,metric='correlation',  method='ward')],:]
+
+# %%
+# heatmap Col colors for type of gene group
+cmap={'NOD_up':'#656F02','NOD_down':'#B5CE76',
+      'db/db+mSTZ_up':'#9A008C','db/db+mSTZ_down':'#F79DD4'}
+column_groups=['_'.join(c.split('_')[:-1]) for c in x.columns]
+col_colors=pd.Series([cmap[c] for c in column_groups],
+                     index=x.columns)
 
 # %%
 # Heatmap
@@ -130,6 +148,72 @@ plt.savefig(path_fig+'heatmap_beta_DENODelim-VSGSTZactivity_finecl.png',dpi=300,
 
 # %% [markdown]
 # C: Dont do standard scale on cells as this is affected by population sizes.
+
+# %% [markdown]
+# As above but with column gaps
+
+# %%
+# Add to R expression and de direction
+x_plot=x.copy()
+x_plot.columns=[i.replace('NOD_','T1-').replace('db/db+mSTZ_','T2-').replace('_','') 
+                for i in x_plot.columns]
+ro.globalenv['x']=x_plot
+ro.globalenv['de_group']=column_groups
+ro.globalenv['de_groups_order']=de_groups_order
+ro.globalenv['de_groups_order_parsed']=[g.replace('_','\n') for g in de_groups_order]
+ro.globalenv['de_groups_colors']=[cmap[c] for c in de_groups_order]
+
+# %% language="R"
+# # DE direction anno
+# ha_col = columnAnnotation(
+#     direction = anno_block(gp = gpar(fill = unlist(de_groups_colors), col='white'), 
+#                            labels = unlist(de_groups_order_parsed),
+#                            height = unit(1, "cm"),
+#                            labels_gp = gpar(col = c('black','white','black','white'))),
+#     annotation_name_side = "left"
+# )
+# # Order DE groups
+# de_group<-factor(as.vector(unlist(de_group)),levels = unlist(de_groups_order))
+
+# %% magic_args="-w 800 -h 800 " language="R"
+# # plot heatmap
+# h<-Heatmap(x,col=viridis(256),
+#        cluster_columns = FALSE, cluster_rows = FALSE,
+#        show_column_names = TRUE, show_row_names = TRUE,
+#        row_title ="fine cell clusters",
+#        top_annotation=ha_col,
+#        column_split =de_group,
+#        column_title = 'DE gene groups',
+#        row_names_side = "left",
+#        heatmap_legend_param = list( title = "relative\nactivity", 
+#                                    title_gp=gpar( fontsize = 12),
+#                                    labels_gp = gpar( fontsize = 12)),
+#        row_gap = unit(1, "mm"),
+#        width= unit(20, "cm"), height= unit(12, "cm"),
+#        show_row_dend = FALSE, 
+#        )
+# draw(h)
+
+# %% magic_args="-i path_fig" language="R"
+# # Save heatmap
+# pdf(file=paste0(path_fig,"heatmap_beta_DENODelim-VSGSTZactivity_finecl_gaps.pdf"), 
+#     width=10, height=6.4) 
+# h<-Heatmap(x,col=viridis(256),
+#        cluster_columns = FALSE, cluster_rows = FALSE,
+#        show_column_names = TRUE, show_row_names = TRUE,
+#        row_title ="fine cell clusters",
+#        top_annotation=ha_col,
+#        column_split =de_group,
+#        column_title = 'DE gene groups',
+#        row_names_side = "left",
+#        heatmap_legend_param = list( title = "relative\nactivity", 
+#                                    title_gp=gpar( fontsize = 12),
+#                                    labels_gp = gpar( fontsize = 12)),
+#        row_gap = unit(1, "mm"),
+#        width= unit(20, "cm"), height= unit(12, "cm"),
+#        show_row_dend = FALSE, 
+#        )
+# draw(h)
 
 # %% [markdown]
 # Coarse beta cell states heatmap
@@ -163,8 +247,8 @@ x=x.loc[:,col_order]
 # %%
 # Heatmap
 w_dend=1.5
-w_colors=0.32
-nrow=x.shape[0]*0.29
+w_colors=0.35
+nrow=x.shape[0]*0.33
 ncol=x.shape[1]*0.3
 w=ncol+w_dend
 h=nrow+w_dend+w_colors

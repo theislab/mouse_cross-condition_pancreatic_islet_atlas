@@ -61,6 +61,10 @@ rpy2.rinterface_lib.callbacks.logger.setLevel(logging.ERROR)
 ro.r('library("hypeR")')
 ro.r("source(paste('/lustre/groups/ml01/code/k.noerenberg/diabetes_analysis/data_exploration/helper_hypeR.R'))")
 
+# %% language="R"
+# library('ComplexHeatmap')
+# library(viridis)
+
 # %%
 path_data='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/'
 path_de='/lustre/groups/ml01/workspace/karin.hrovatin/data/pancreas/scRNA/combined/de/de_sexaging_covarSample/'
@@ -470,6 +474,91 @@ l.get_frame().set_alpha(0)
 # Save
 plt.savefig(path_fig+'heatmap_beta_sexagedDEcl_coarseCLsex.png',
             dpi=300,bbox_inches='tight')
+
+# %% [markdown]
+# Same heatmap as above but with column gaps
+
+# %%
+# Add to R expression and de direction
+ro.globalenv['x']=data_plot
+de_group=[c.split()[0] for c in data_plot.columns]
+ro.globalenv['de_group']=de_group
+de_groups_order=list(dict.fromkeys(de_group))
+ro.globalenv['de_groups_order']=de_groups_order
+ro.globalenv['de_groups_order_parsed']=[g+' up' for g in de_groups_order]
+ro.globalenv['de_groups_colors']=[sex_cmap[c] for c in de_groups_order]
+ro.globalenv['cell_sex']=[i.split('- ')[1].replace('F','female').replace('M','male') 
+                          for i in data_plot.index]
+
+# %% language="R"
+# # DE direction anno
+# de_groups_order<-unlist(de_groups_order)
+# de_groups_colors<-unlist(de_groups_colors)
+# ha_col = columnAnnotation(
+#     direction = anno_block(gp = gpar(fill = de_groups_colors, col='white'), 
+#                            labels = unlist(de_groups_order_parsed),
+#                             labels_gp = gpar(col = "white"),),
+#     annotation_name_side = "left"
+# )
+# # Order DE groups
+# de_group<-factor(as.vector(unlist(de_group)),levels = de_groups_order)
+
+# %% language="R"
+# # Cell sex annotation
+# # Prepare sex order
+# sex_anno<-factor(cell_sex,levels = de_groups_order)
+# ha_row = rowAnnotation(
+#     sex=sex_anno,
+#     col = list(sex = setNames(  de_groups_colors,de_groups_order)),
+#     annotation_name_side = "bottom",
+#     annotation_legend_param = list( 
+#         sex =list(
+#             title = "sex",
+#             title_gp=gpar( fontsize = 12),
+#             labels_gp = gpar( fontsize = 12)))
+# )
+
+# %% magic_args="-w 400 -h 400 " language="R"
+# # plot heatmap
+# h<-Heatmap(x,col=viridis(256),
+#        cluster_columns = FALSE, cluster_rows = FALSE,
+#        show_column_names = TRUE, show_row_names = TRUE,
+#        row_title ="coarse cell clusters\n(separated by sex)",
+#        top_annotation=ha_col,
+#        left_annotation=ha_row,
+#        column_split =de_group,
+#        column_title = 'DE gene groups',
+#        row_names_side = "left",
+#        heatmap_legend_param = list( title = "relative\nactivity", 
+#                                    title_gp=gpar( fontsize = 12),
+#                                    labels_gp = gpar( fontsize = 12)),
+#        row_gap = unit(1, "mm"),
+#        width= unit(5, "cm"), height= unit(5, "cm"),
+#        show_row_dend = FALSE, 
+#        )
+# draw(h)
+
+# %% magic_args="-i path_fig" language="R"
+# # Save heatmap
+# pdf(file=paste0(path_fig,"heatmap_beta_sexagedDEcl_coarseCLsex_gaps.pdf"), 
+#     width=4.9, height=3.4)
+# h<-Heatmap(x,col=viridis(256),
+#        cluster_columns = FALSE, cluster_rows = FALSE,
+#        show_column_names = TRUE, show_row_names = TRUE,
+#        row_title ="coarse cell clusters\n(separated by sex)",
+#        top_annotation=ha_col,
+#        left_annotation=ha_row,
+#        column_split =de_group,
+#        column_title = 'DE gene groups',
+#        row_names_side = "left",
+#        heatmap_legend_param = list( title = "relative\nactivity", 
+#                                    title_gp=gpar( fontsize = 12),
+#                                    labels_gp = gpar( fontsize = 12)),
+#        row_gap = unit(1, "mm"),
+#        width= unit(5, "cm"), height= unit(5, "cm"),
+#        show_row_dend = FALSE, 
+#        )
+# draw(h)
 
 # %% [markdown]
 # ### Top DE genes

@@ -2090,24 +2090,22 @@ plt.savefig(path_fig+'heatmap_atlas_celltype_samples.png',dpi=300,bbox_inches='t
 # %%
 # N cells per sample
 n=pd.DataFrame(obs.groupby('study_sample').size().rename('N cells'))
-n['study']=[obs.query('study_sample==@s').study_parsed[0] for s in n.index]
+n['dataset']=[obs.query('study_sample==@s').study_parsed[0] for s in n.index]
 
 # Order studies by median N cells per study
-n['study']=pd.Categorical(
-    n['study'],
-    n.groupby('study').median().sort_values('N cells',ascending=False).index,
+n['dataset']=pd.Categorical(
+    n['dataset'],
+    n.groupby('dataset').median().sort_values('N cells',ascending=False).index,
     ordered=True)
 
 # Study colors
-adata_temp=sc.AnnData(obs=obs)
-sc.pl._utils._set_default_colors_for_categorical_obs(adata_temp, 'study_parsed')
-study_cmap=dict(zip(obs.study_parsed.cat.categories,
-                    adata_temp.uns['study_parsed_colors']))
+study_cmap=dict(zip(uns['study_parsed_order'],
+                    uns['study_parsed_colors']))
 
 # %%
 # Plot swarmplot of N cells per sample per study
 rcParams['figure.figsize']=(3,3)
-g=sb.swarmplot(x='N cells',y='study',data=n,hue='study',palette=study_cmap,s=4)
+g=sb.swarmplot(x='N cells',y='dataset',data=n,hue='dataset',palette=study_cmap,s=4)
 g.set(facecolor = (0,0,0,0))
 g.spines['top'].set_visible(False)
 g.spines['right'].set_visible(False)
@@ -2167,7 +2165,7 @@ n_sub['cell type']=n_sub['cell type'].astype('str')
 g=sb.barplot(x='N cells (thousands)',y='cell type',data=n_sub,palette=ct_cmap,)
 # text anno
 for idx,p in enumerate(g.patches):
-    n_cells=n_sub.sort_values('cell type')['N cells'][idx]
+    n_cells=n_sub['N cells'][idx]
     g.annotate(n_cells, 
                    (p.get_x()+p.get_width() , p.get_y()+p.get_height()/2 ), 
                    ha = 'center', va = 'center', 
@@ -2179,3 +2177,5 @@ g.set(facecolor = (0,0,0,0))
 g.spines['top'].set_visible(False)
 g.spines['right'].set_visible(False)
 plt.savefig(path_fig+'barplot_atlas_count_celltype_nolowQ.png',dpi=300,bbox_inches='tight')
+
+# %%
