@@ -326,6 +326,8 @@ x_plot=x.loc[categories,gene_list].copy()
 studies = [i.split('(')[1].split(')')[0] for i in x_plot.index]
 ro.globalenv['x_ordered']=x_plot
 ro.globalenv['studies']=studies
+ro.globalenv['row_names']=list(x_plot.index)
+ro.globalenv['row_labels']=[i.split(' (')[0] for i in x_plot.index]
 
 # %%
 # Gene name anno for R
@@ -375,12 +377,17 @@ ro.globalenv['models']=[s.replace('8-16w','') for s  in list(dict.fromkeys(studi
 #         labels_gp = gpar(col = "white")))
 # studies_anno<-factor(as.vector(unlist(studies)),levels = unlist(study_order))
 
+# %% language="R"
+# # Row labels
+# row_labels=structure(row_labels,names=row_names)
+
 # %% magic_args="-w 800 -h 300 " language="R"
 # # plot heatmap
 # h<-Heatmap(x_ordered,col=viridis(256),
+#        row_labels = row_labels[rownames(x_ordered)],
 #        cluster_columns = FALSE, cluster_rows = FALSE,
 #        show_column_names = FALSE, show_row_names = TRUE,
-#        row_title ="cell clusters\n(per dataset)",
+#        row_title ="cell clusters",
 #        top_annotation=ha_col,
 #        left_annotation=row_anno,
 #        column_split =as.vector(unlist(directions_anno)),
@@ -399,11 +406,12 @@ ro.globalenv['models']=[s.replace('8-16w','') for s  in list(dict.fromkeys(studi
 # %% magic_args="-i path_fig" language="R"
 # # Save heatmap
 # pdf(file=paste0(path_fig,"heatmap_beta_diabetesSharedDE_clFineDInterDataset_annotated.pdf"), 
-#     width=9.7, height=3.3)
+#     width=8.7, height=3.2)
 # h<-Heatmap(x_ordered,col=viridis(256),
+#        row_labels = row_labels[rownames(x_ordered)],
 #        cluster_columns = FALSE, cluster_rows = FALSE,
 #        show_column_names = FALSE, show_row_names = TRUE,
-#        row_title ="cell clusters\n(per dataset)",
+#        row_title ="cell clusters",
 #        top_annotation=ha_col,
 #        left_annotation=row_anno,
 #        column_split =as.vector(unlist(directions_anno)),

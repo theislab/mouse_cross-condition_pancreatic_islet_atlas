@@ -632,6 +632,8 @@ for idx1 in range(de_combined.shape[1]-1):
         overlap.at[name1,name2]=n
         overlap.at[name2,name1]=n
 overlap=overlap.fillna(1)
+overlap.index.name='DE genes'
+overlap.columns.name='DE genes'
 
 # %%
 # Plot overlap
@@ -639,6 +641,21 @@ g=sb.clustermap(overlap,cmap='viridis',figsize=(3.5,3.5),vmin=0,vmax=1)
 g.ax_cbar.set_title('Jaccard index')
 g.ax_cbar.yaxis.set_ticks_position("left")
 plt.savefig(path_fig+'heatmap_atlas_endoDEcomparison.png',dpi=300,bbox_inches='tight')
+
+# %%
+# Get label ordering, as matrix is symmetrical it assumes that ordering on x and y is the same
+label_order=[x.get_text() for x in g.ax_heatmap.xaxis.get_ticklabels()]
+
+# %%
+# Upper triangular with clustering order as above
+rcParams['figure.figsize']=(2.4,2)
+# Reorder (assuming symetrical order), drop rows to exclude diagonal, and make upper mask
+overlap_ordered=overlap.loc[label_order,label_order].copy().iloc[1:,:-1]
+mask = np.zeros_like(overlap_ordered)
+mask[np.triu_indices_from(overlap_ordered,k=1)] = True
+g=sb.heatmap(overlap_ordered,mask=mask,square=True,cmap='viridis',
+            cbar_kws={'label': 'Jaccard index'})
+plt.savefig(path_fig+'heatmap_atlas_endoDEcomparison_triu.png',dpi=300,bbox_inches='tight')
 
 # %% [markdown]
 # Same as above, but separately for up and down genes

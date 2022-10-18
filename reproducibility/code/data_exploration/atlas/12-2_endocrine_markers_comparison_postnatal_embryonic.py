@@ -215,7 +215,7 @@ genes={'alpha\n(human)':['Irx2','Ttr','Gcg','Slc7a2'],
        'beta\n(human)':['Ins1', 'Ins2', 'G6pc2', 'Iapp'],
        'delta\n(human)':['Rbp4','Sst'],
        'gamma\n(human)':['Ppy'],
-       'epsilon\n(knwon)':['Ghrl','Irs4'],
+       'epsilon\n(human)':['Ghrl','Irs4'],
        'alpha\n(new)':['Wnk3', 'Nxph1', 
                        # 'Galnt13' #- not good marker in postnatal - also in gamma
                       ],

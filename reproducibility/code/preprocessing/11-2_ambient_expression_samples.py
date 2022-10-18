@@ -114,7 +114,7 @@ for i,gene in enumerate(sorted(list(data_plot['gene'].unique()))):
     if i!=len(axs)-1:
         ax.legend().remove()
     else:
-        ax.legend(bbox_to_anchor=(1.01,1.), frameon=False,title='study')
+        ax.legend(bbox_to_anchor=(1.01,1.), frameon=False,title='dataset')
     if i!=0:
         ax.set_ylabel('')
     ax.set_xlabel('')

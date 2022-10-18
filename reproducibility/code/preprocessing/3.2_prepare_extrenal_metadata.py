@@ -58,15 +58,18 @@ for species,name,d in datasets:
     obs=sc.read(file,backed='r').obs.copy()
     donors_all=set(obs.donor.unique()) if 'donor' in obs.columns else set()
     # all data cols
+    print("N cells %i; N beta cells %i"%(obs.shape[0],obs.query('cell_type=="beta"').shape[0]))
     print('All cols:',list(obs.columns))
     # Remove cells not useful for saving and grouping
     cols_keep=[c for c in obs.columns 
          # Remove organ/organism/tisse/cell info/geo_accession 
          # (as not added to all samples now,may also not be sample specific (e.g. could be cells)
          if 'organ' not in c and 'tissue' not in c and 'cell_' not in c
-            and 'geo_accession' not in c ]
+            # Can not add geo accession to donors as for some datasets it is cell specific
+            and 'geo_accession' not in c  
+            and 'size_factor' not in c]
     # Make groups based on kept cols
-    # Make sure empty groups are dropped and groups with NA are not dsriopped - does not work
+    # Make sure empty groups are dropped and groups with NA are not dropped - does not work
     # Thuis fill nan with NA, must first remove categorical
     def uncategorize(col):
         if col.dtype.name == 'category':
@@ -76,10 +79,12 @@ for species,name,d in datasets:
     obs = obs.apply(uncategorize, axis=0)
     obs=obs.fillna('NA')
     obs=obs.groupby(cols_keep,observed=True,dropna=False)
-    # N beta cells per group - add to df
+    # N beta cells and all cells per group - add to df
     n_beta=obs.apply(lambda x:x.query('cell_type=="beta"').shape[0])
+    n_cells=obs.apply(lambda x:x.shape[0])
     # Workaround to add n_beta - remove size latter
     obs=pd.DataFrame(obs.size())
+    obs['N_cells']=n_cells.values
     obs['N_beta_cells']=n_beta.values
     obs=obs.reset_index().drop(0,axis=1)
     # Add species
