@@ -2,7 +2,7 @@
 
 Reproducibility code for mouse pancreatic islet scRNA-seq atlas from Hrovatin et al.
 
-<!-- #region -->
+
 ## Processing steps:
 
 All processing code files are in the directory code. For additional instructions on how to run the code see Notes below.
@@ -92,6 +92,12 @@ Atlas reference mapping
  - 23.1: Reference mapping (integration/scArches/23-1*)
  - 23.2: Joint embedding of the atlas and the external mouse dataset with cell state transfer (data_exploration/atlas/beta/23-2*)
 
+Prepare data for submission
+- 24: Prepare certain tables for paper and supplements that require combining and editing of multiple previously generated tables. Some tables were prepared manualy or directly in other files and are thus not edited here. (prepare_submit/24*)
+- 25: Anndata objects
+ - 25.1: Atlas adata for cellxgene (prepare_submit/25-1*)
+ - 25.2: Atlas adata for GEO (prepare_submit/25-2*)
+ - 25.3: Result of reference mapping of GSE137909 for GEO
 
 ### Notes on execution order and file content
 
@@ -121,4 +127,3 @@ Directory data contains additional tables used in the code. The directory data c
 
 Raw scRNA-seq data is availiable on GEO, as specified in the publication. 
 
-<!-- #endregion -->
