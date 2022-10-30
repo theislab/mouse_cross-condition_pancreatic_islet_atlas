@@ -10,7 +10,7 @@ The mapping can be done simply by ruining the example jupyter notebook (code/ref
 
 #### Data and code
 
-We provide the scArches atlas model in data/scArches and the reference and query datasets needed to run the example mapping in data/scArches and data/mapref_scArches*, respectively.
+We provide the scArches atlas model in data/scArches and the reference and query datasets needed to run the example mapping in data/scRNA. An example output of our reference mapping vignette is in directory data/mapref_*. 
 
 The reference mapping code example is provided in code/reference_mapping.ipynb.
 <br/><br/>
