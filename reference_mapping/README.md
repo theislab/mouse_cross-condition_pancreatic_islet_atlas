@@ -31,6 +31,3 @@ The mapping can be done with the environment specified in data/env/pip_freeze.tx
 #### References
 scArches: [Lotfollahi et al., Nature Biotechnology 2021](https://www.nature.com/articles/s41587-021-01001-7), doi:10.1038/s41587-021-01001-7<br>
 
-```python
-
-```
