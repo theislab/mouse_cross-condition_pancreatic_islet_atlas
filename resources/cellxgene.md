@@ -13,7 +13,7 @@ Link: https://cellxgene.cziscience.com/collections/296237e2-393d-4e31-b590-b03f7
 - cell_cycle_phase: Phase of cell cycle (cyclone).
 - cell_filtering: FACS sorting.
 - cell_subtype_beta_coarse_reannotatedIntegrated: Beta cell subtype reannotation on integrated atlas. Coarse annotation based on metadata information. Abbreviations: NOD-D - NOD diabetic, M/F - male/female, chem - chem dataset, imm. - immature, lowQ - low quality, hMT - high mitochondrial fraction.
-   'cell_subtype_beta_fine_reannotatedIntegrated':'Beta cell subtype reannotation on '+\
+- cell_subtype_beta_fine_reannotatedIntegrated':'Beta cell subtype reannotation on '+\
           'integrated atlas. Fine annotation aimed at capturing all biollogically '+\
           'distinct beta cell subtypes (assesed based on gene program activity patterns).' +\
           'Abbreviations: D-inter. - diabetic intermediate, NOD-D - NOD diabetic, '+\
