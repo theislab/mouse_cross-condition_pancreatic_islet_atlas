@@ -107,7 +107,7 @@ Prepare data for submission
 - There are some .txt/.sbatch files (often nammed with number ending in -0) that contain shell comands for runing individual analyses or multiple steps (in order) on multiple input files, often via .sbatch for deploying code on internal servers, which in most cases at the end results in calling .py or .R files that contain the processing code. Some of the .txt files require different processing options to be selected by un/re-commenting code, as explained in the comments.
 - Function scripts - store functions, but not analysis. Thus they are not numbered as they are never ran directly.
 - Some scripts contain variables WSCL and WSL - these variables were set in bash and contain information on paths to code directory (WSCL, /lustre/groups/ml01/code/karin.hrovatin/) and data directory (WSL, /lustre/groups/ml01/workspace/karin.hrovatin/).
-- In some of the notebooks teh data was saved with custom functions to overcome saving problems on or servers. These functions can be replaced with Scanpy functions:
+- In some of the notebooks the data was saved with custom functions to overcome saving problems on or servers. These functions can be replaced with Scanpy functions:
 
     ```py
     # Saving
