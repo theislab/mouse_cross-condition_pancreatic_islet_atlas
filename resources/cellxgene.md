@@ -2,9 +2,9 @@
 
 Link: https://cellxgene.cziscience.com/collections/296237e2-393d-4e31-b590-b03f74ac5070
 
-The cellxgene dataset is optimised for visualisation in the web portal. For reproducibility purposes and further details please refer to the anndata object on GEO: GSE211799 (GSE211799_adata_atlas.h5ad.gz).
+The cellxgene object is optimised for visualisation in the web portal. For reproducibility purposes and further details please refer to the anndata object on GEO: GSE211799 (supplementary file: GSE211799_adata_atlas.h5ad.gz).
 
-## Field description
+## Field descriptions
 
 ### Obs
 - GEO_accession: GEO accession of each dataset.
