@@ -67,6 +67,16 @@ for idx,gene in enumerate(genes):
 plt.savefig(path_fig+'umap_beta_markers_integration_nolowQ_eopt.png',dpi=300,bbox_inches='tight')
 
 # %%
-path_fig+'umap_beta_markers_integration_eopt.png'
+# Plot known markers without low quality beta cells
+fig,ax=plt.subplots(1,len(genes),figsize=(2.3*len(genes),2))
+np.random.seed(0)
+subset=~adata_rn_b.obs['leiden_r1.5_parsed_const'].str.contains('low_quality')
+random_indices=np.random.permutation(list(range(adata_rn_b[subset,:].shape[0])))
+for idx,gene in enumerate(genes):
+    sc.pl.embedding(adata_rn_b[subset,:][random_indices,:],'X_umap_opt',
+           color=gene,gene_symbols='gene_symbol',
+           s=3, ncols=6, frameon=False, ax=ax[idx],show=False)
+#fig.tight_layout()
+plt.savefig(path_fig+'umap_beta_markers_integration_nolowQ_eopt_horizontal.png',dpi=300,bbox_inches='tight')
 
 # %%
