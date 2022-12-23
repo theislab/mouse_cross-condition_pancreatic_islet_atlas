@@ -4,7 +4,8 @@ To better understand pancreatic β-cell heterogeneity we generated a mouse pancr
 
 We used the atlas to obtain new insights into islet biology that could not have been obtained from individual datasets. This includes holistic description of the β-cell landscape across datasets and conditions, identification of similarities and differences between diabetes models, and disentanglement of molecular pathways involved in different types of β-cell dysfunction.
 
-![image](https://user-images.githubusercontent.com/47607471/209293011-61091af5-5b18-47d5-945b-1cf703fcae90.png)
+<img src="https://user-images.githubusercontent.com/47607471/209294036-85e42d11-c90d-4d14-a167-0dee00ec2bfe.png" alt="atlas_overview" width="600"/>
+
 Figure 1: The mouse islet atlas (MIA) of scRNA-seq datasets across conditions offers new insights into islet and β-cell biology. Highlighted are (a) MIA content, including different conditions: sex, age, diabetes models (STZ, db/db, NOD) and anti-diabetic treatments, and chemical stress (application of different chemicals such as FoxO inhibitor), (b) putative novel biological insights, (c) analyses enabled by MIA that would not have been possible on individual datasets, and (d) potential use cases of MIA as a resource for future studies.
 
 ## Citation:
