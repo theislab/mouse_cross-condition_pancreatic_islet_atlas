@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.7.1
+#       jupytext_version: 1.14.4
 #   kernelspec:
 #     display_name: Python rpy2_3
 #     language: python
@@ -54,10 +54,9 @@ path_tables+'endocrine_markers.xlsx'
 # ## Human diabetes comparison
 
 # %%
-# Load table parts
 res={}
 res['T1D_DE']=pd.read_table(path_data+'de_human/diabetes/T1D_vs_healthy.tsv')
-res['T2D_DE']=pd.read_table(path_data+'de_human/diabetes/T1D_vs_healthy.tsv')
+res['T2D_DE']=pd.read_table(path_data+'de_human/diabetes/T2D_vs_healthy.tsv')
 for dt,res_sub in pd.read_excel(
     path_data+'de_human/diabetes/human_overlap_enrichment.xlsx',sheet_name=None,index_col=0).items():
     res_sub.rename({'label':'gene_set'},axis=1,inplace=True)

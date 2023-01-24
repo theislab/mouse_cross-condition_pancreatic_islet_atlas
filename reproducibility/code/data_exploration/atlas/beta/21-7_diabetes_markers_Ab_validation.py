@@ -95,7 +95,7 @@ categories=['healthy control (NOD)','NOD',
 # %%
 # Dotplot of genes
 sc.pl.dotplot(adata_rn_b_sub, 
-              var_names=['Ucn3','Nucb2','Fkbp11','Mt3','Aldh1a3'],
+              var_names=['Ucn3','Aldh1a3','Nucb2','Fkbp11','Mt3'],
               gene_symbols='gene_symbol',use_raw=False,
               groupby='diseased_group',
               standard_scale='var',show=False,
