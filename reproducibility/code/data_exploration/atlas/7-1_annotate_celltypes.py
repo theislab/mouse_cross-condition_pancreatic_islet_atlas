@@ -1928,8 +1928,55 @@ if True:
                      'cell_type_integrated_v1_parsed_order')],
                    rm=None, unique_id2=None,io_copy=False)
 
+# %% [markdown]
+# ### Correct anno & parsed anno
+
+# %%
+# Change cell type names
+adata.obs['cell_type_integrated_v2']=adata.obs['cell_type_integrated_v1'].replace({
+    'stellate_activated':'stellate_quiescent',
+    'stellate_quiescent':'stellate_activated'
+})
+# Change cell type names
+adata.obs['cell_type_integrated_v2_parsed']=adata.obs['cell_type_integrated_v1_parsed'].replace({
+    'stellate a.':'stellate q.',
+    'stellate q.':'stellate a.'
+})
+
+# %%
+# make sorted order
+adata.uns['cell_type_integrated_v2_parsed_order']=adata.uns[
+    'cell_type_integrated_v1_parsed_order']
+adata.obs['cell_type_integrated_v2_parsed']=pd.Categorical(
+    values=adata.obs['cell_type_integrated_v2_parsed'],
+    categories=adata.uns['cell_type_integrated_v2_parsed_order'],ordered=True)
+
+# %%
+# List cts
+print(adata.obs['cell_type_integrated_v2_parsed'].cat.categories.values)
+if not (adata.obs['cell_type_integrated_v2_parsed'].nunique()==
+      adata.obs['cell_type_integrated_v2'].nunique()):
+        raise ValueError('Not all ts succesfully renamed')
+
+# %%
+# Safety check to not run this if not needed, set to True to save
+if False:
+    h.update_adata(adata_new=adata,
+               path=path_data+'data_integrated_analysed.h5ad',
+               add=[('obs',True,
+                     'cell_type_integrated_v2',
+                     'cell_type_integrated_v2'),
+                   ('obs',True,
+                     'cell_type_integrated_v2_parsed',
+                     'cell_type_integrated_v2_parsed'),
+                    ('uns',True,
+                     'cell_type_integrated_v2_parsed_order',
+                     'cell_type_integrated_v2_parsed_order')],
+                   rm=None, unique_id2=None,io_copy=False)
+
 # %%
 del adata
+gc.collect()
 
 # %% [markdown]
 # # Summary stats
@@ -1949,7 +1996,7 @@ obs['studyparsed_design_sample']=[
     '_'.join(i) for i in 
      zip(obs.study_parsed,obs.design,obs.file)]
 for (sample,hc),ratio in obs.\
-        groupby('studyparsed_design_sample',observed=True)['cell_type_integrated_v1_parsed'].\
+        groupby('studyparsed_design_sample',observed=True)['cell_type_integrated_v2_parsed'].\
         value_counts(normalize=False,sort=False).iteritems():
     group_sample_ratios.at[sample,hc]=ratio 
 group_sample_ratios.fillna(0,inplace=True)  
@@ -1988,7 +2035,7 @@ studies=group_sample_ratios.study.values
 # Drop unused cols
 group_sample_ratios.drop(['study','design'],axis=1,inplace=True)
 # Sort/select columns
-group_sample_ratios=group_sample_ratios[obs['cell_type_integrated_v1_parsed'].cat.categories]
+group_sample_ratios=group_sample_ratios[obs['cell_type_integrated_v2_parsed'].cat.categories]
 
 # Order columns
 #group_sample_ratios=group_sample_ratios.iloc[:,
@@ -2000,7 +2047,7 @@ group_sample_ratios=group_sample_ratios[obs['cell_type_integrated_v1_parsed'].ca
 adata_temp=sc.AnnData(obs=obs)
 #sc.pl._utils._set_default_colors_for_categorical_obs(adata_temp, 'study_parsed')
 study_cmap=dict(zip(obs.study_parsed.cat.categories,
-                    adata_temp.uns['study_parsed_colors']))
+                    uns['study_parsed_colors']))
 study_colors=[study_cmap[s] for s in studies]
 
 # Age map
@@ -2010,6 +2057,7 @@ study_age_categ={
     'Fltp_adult':'3-7m', 
     'Fltp_P16':'0-1m', 
     'NOD':'1-1.5m', 
+   # 'NOD_elimination':None, 
     'spikein_drug':'2-3m', 
     'VSG':'3-7m', 
     'STZ':'3-7m',
@@ -2118,7 +2166,7 @@ plt.savefig(path_fig+'swarmplot_atlas_count_studysample.png',dpi=300,bbox_inches
 
 # %%
 # N cells per ct
-n=pd.DataFrame(obs.groupby('cell_type_integrated_v1_parsed').size().rename('N cells'))
+n=pd.DataFrame(obs.groupby('cell_type_integrated_v2_parsed').size().rename('N cells'))
 n.index.name='cell type'
 n=n.reset_index()
 n.index=n['cell type'].rename(None)
@@ -2126,9 +2174,9 @@ n['N cells (thousands)']=n['N cells']/1000
 
 # ct colors
 ct_map=dict(zip())
-ct_cmap=dict(zip(obs.cell_type_integrated_v1.cat.categories,
-                uns['cell_type_integrated_v1_colors'].copy()))
-ct_cmap={obs.query('cell_type_integrated_v1==@ct')['cell_type_integrated_v1_parsed'][0]:c 
+ct_cmap=dict(zip(obs.cell_type_integrated_v2.cat.categories,
+                uns['cell_type_integrated_v2_colors'].copy()))
+ct_cmap={obs.query('cell_type_integrated_v2==@ct')['cell_type_integrated_v2_parsed'][0]:c 
         for ct,c in ct_cmap.items()}
 
 # Order by N cells

@@ -441,22 +441,32 @@ h.update_adata(adata_new=adata,path=path_data+'data_integrated_analysed.h5ad',
 adata.obs['pre_cell_type_unified_postnatal']=adata.obs['pre_cell_type_unified'].apply(
     lambda x: 'embryo' if x.startswith('E ') else x).astype('category')
 
+# %% [raw]
+# # Used to see which hex corresponds to which color
+# for i,c in enumerate([
+#    '#FFAA92', '#0AA6D8', '#FAD09F', '#72418F', '#9B9700', '#006FA6',
+#    '#FFB500', '#D790FF', '#FF913F', '#A4E804', '#324E72', '#D16100',
+#    '#44a4b8', '#B05B6F', '#A77500', '#788D66', '#BEC459', '#FF8A9A',
+#    '#7A87A1', '#D157A0']):
+#     plt.scatter(i,i,c=c,label=c)
+# plt.legend()
+
 # %%
 # Pre-set colors for main cts
-adata.uns['cell_type_integrated_v1_colors']=[
+adata.uns['cell_type_integrated_v2_colors']=[
    '#FFAA92', '#0AA6D8', '#FAD09F', '#72418F', '#9B9700', '#006FA6',
    '#FFB500', '#D790FF', '#FF913F', '#A4E804', '#324E72', '#D16100',
    '#44a4b8', '#B05B6F', '#A77500', '#788D66', '#BEC459', '#FF8A9A',
-   '#D157A0', '#7A87A1']
-ct_integr_cmap=dict(zip(adata.obs['cell_type_integrated_v1'].cat.categories,
-                        adata.uns['cell_type_integrated_v1_colors']))
+   '#7A87A1', '#D157A0']
+ct_integr_cmap=dict(zip(adata.obs['cell_type_integrated_v2'].cat.categories,
+                        adata.uns['cell_type_integrated_v2_colors']))
 ct_integr_cmap={
-    adata.obs.query('cell_type_integrated_v1==@ct')['cell_type_integrated_v1_parsed'][0]:c 
+    adata.obs.query('cell_type_integrated_v2==@ct')['cell_type_integrated_v2_parsed'][0]:c 
         for ct,c in ct_integr_cmap.items()}
 
 # %%
-# Custom color palete matched across columns with NA in light gray
-ct_cols=['cell_type_integrated_v1_parsed',
+# Custom color palete matched across columns with NA in light gary
+ct_cols=['cell_type_integrated_v2_parsed',
          'pre_cell_type_unified','pre_cell_type_unified_postnatal',
          'cell_type_parsed']
 for col in ct_cols:
@@ -484,10 +494,10 @@ adata.uns['pre_cell_type_original_colors']=[
 
 # %%
 # Save color palete for cts
-if True:
+if False:
     h.update_adata(adata_new=adata,path=path_data+'data_integrated_analysed.h5ad',
                add=[
-                  ('uns',True,'cell_type_integrated_v1_colors','cell_type_integrated_v1_colors'),
+                  ('uns',True,'cell_type_integrated_v2_colors','cell_type_integrated_v2_colors'),
                ],
                rm=None,unique_id2=None,io_copy=False)
 
@@ -572,8 +582,8 @@ if True:
 # %%
 fig,ax=plt.subplots(figsize=(5,5))
 np.random.seed(0)
-random_indices=np.random.permutation(list(range(adata[subset,:].shape[0])))
-sc.pl.umap(adata[subset,:][random_indices,:],color='study_parsed',s=3,
+random_indices=np.random.permutation(list(range(adata[adata.obs['low_q'],:].shape[0])))
+sc.pl.umap(adata[adata.obs['low_q'],:][random_indices,:],color='study_parsed',s=3,
           frameon=False,title='study',ax=ax,show=False)
 #fig.tight_layout() # Set to False so that stuff is properly drawn
 ax.legend_.set_title('study')
@@ -583,13 +593,14 @@ plt.savefig(path_fig+'umap_atlas_covariate_study_nolowQ.png',dpi=300,bbox_inches
 # Ct
 fig,ax=plt.subplots(figsize=(5,5))
 np.random.seed(0)
-cl_cmap=dict(zip(adata.obs['cell_type_integrated_v1'].cat.categories,
-                 adata.uns['cell_type_integrated_v1_colors']))
-cl_cmap={ct:cl_cmap[adata.obs.query('cell_type_integrated_v1_parsed==@ct'
-                        )['cell_type_integrated_v1'].values[0]] 
-         for ct in adata.obs['cell_type_integrated_v1_parsed'].cat.categories}
-random_indices=np.random.permutation(list(range(adata[subset,:].shape[0])))
-sc.pl.umap(adata[subset,:][random_indices,:],color='cell_type_integrated_v1_parsed',s=3,
+cl_cmap=dict(zip(adata.obs['cell_type_integrated_v2'].cat.categories,
+                 adata.uns['cell_type_integrated_v2_colors']))
+cl_cmap={ct:cl_cmap[adata.obs.query('cell_type_integrated_v2_parsed==@ct'
+                        )['cell_type_integrated_v2'].values[0]] 
+         for ct in adata.obs['cell_type_integrated_v2_parsed'].cat.categories}
+random_indices=np.random.permutation(list(range(adata[adata.obs['low_q'],:].shape[0])))
+sc.pl.umap(adata[adata.obs['low_q'],:][random_indices,:],
+           color='cell_type_integrated_v2_parsed',s=3,
           frameon=False,title='study',ax=ax,show=False,palette=cl_cmap)
 #fig.tight_layout() # Set to False so that stuff is properly drawn
 ax.legend_.set_title('study')
@@ -600,14 +611,14 @@ plt.savefig(path_fig+'umap_atlas_celltype_integrated_nolowQ.png',
 # #### Compare cell type overlaps per study
 
 # %%
-# Per study comparison of previous satudy and my annotation, using unified annotation
+# Per study comparison of previous and my annotation, using unified annotation
 for study in adata.obs.study_parsed.unique():
     obs_sub=adata[adata.obs.study_parsed==study,:].obs
     if not (obs_sub['pre_cell_type_unified']=='NA').all():
         # Confusion matrix normalised by previous anno group
         # Do not display NA from previous anno (cells not present)
         confusion=obs_sub.groupby(['pre_cell_type_unified'],dropna=False)[
-            'cell_type_integrated_v1'].value_counts(
+            'cell_type_integrated_v2'].value_counts(
             normalize=True,dropna=False).unstack().fillna(0).drop('NA',axis=0)
         confusion.columns.name='cell type'
         confusion.index.name='cell type original unified'
@@ -615,7 +626,7 @@ for study in adata.obs.study_parsed.unique():
         # Colorscale
         # Min and max values
         confusion_unnorm=obs_sub.groupby(['pre_cell_type_unified'],dropna=False)[
-            'cell_type_integrated_v1'].value_counts(
+            'cell_type_integrated_v2'].value_counts(
             dropna=False).unstack().fillna(0).drop('NA',axis=0)
         # Round scale to certain precision
         sums_rows=confusion_unnorm.sum(axis=1)
@@ -662,14 +673,14 @@ for study in adata.obs.study_parsed.unique():
         plt.close()
 
 # %%
-# Per study comparison of previous study and my annotation (not unified)
+# Per study comparison of previous and my annotation (not unified)
 for study in adata.obs.study_parsed.unique():
     obs_sub=adata[adata.obs.study_parsed==study,:].obs
     if not (obs_sub['pre_cell_type_original']=='NA').all():
         # Confusion matrix normalised by previous anno group
         # Do not display NA from previous anno (cells not present)
         confusion=obs_sub.groupby(['pre_cell_type_original'],dropna=False)[
-            'cell_type_integrated_v1_parsed'].value_counts(
+            'cell_type_integrated_v2_parsed'].value_counts(
             normalize=True,dropna=False).unstack().fillna(0).drop('NA',axis=0)
         confusion.columns.name='cell type'
         confusion.index.name='cell type original'
@@ -677,7 +688,7 @@ for study in adata.obs.study_parsed.unique():
         # Colorscale
         # Min and max values
         confusion_unnorm=obs_sub.groupby(['pre_cell_type_original'],dropna=False)[
-            'cell_type_integrated_v1_parsed'].value_counts(
+            'cell_type_integrated_v2_parsed'].value_counts(
             dropna=False).unstack().fillna(0).drop('NA',axis=0)
         # Round scale to certain precision
         sums_rows=confusion_unnorm.sum(axis=1)
@@ -747,7 +758,7 @@ obs_sub=adata.obs
 # Do not display NA from previous anno (cells not present)
 # Drop NA (missing) cells in comparison ct set
 confusion=obs_sub.groupby(['cell_type'],dropna=False)[
-    'cell_type_integrated_v1'].value_counts(
+    'cell_type_integrated_v2'].value_counts(
     normalize=True,dropna=False).unstack().fillna(0).drop('NA',axis=0)
 confusion.columns.name='cell type'
 confusion.index.name='cell type per-study'
@@ -755,7 +766,7 @@ confusion.index.name='cell type per-study'
 # Colorscale
 # Min and max values
 confusion_unnorm=obs_sub.groupby(['cell_type'],dropna=False)[
-    'cell_type_integrated_v1'].value_counts(
+    'cell_type_integrated_v2'].value_counts(
     dropna=False).unstack().fillna(0).drop('NA',axis=0)
 # Round scale to certain precision
 sums_rows=confusion_unnorm.sum(axis=1)

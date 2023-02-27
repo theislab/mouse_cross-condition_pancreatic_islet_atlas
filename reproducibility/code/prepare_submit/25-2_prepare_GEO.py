@@ -68,11 +68,11 @@ add_anna={
            'age', 'strain', 'tissue', 'technique', 
            'study_sample_design', 'cell_type', 'cell_type_multiplet', 'cell_subtype', 
            'cell_subtype_multiplet', 'design', 
-           'cell_type_integrated_v1',
+           'cell_type_integrated_v2',
            'size_factors_integrated', 'pre_cell_type_unified', 'pre_cell_type_original', 
-           'study_parsed', 'cell_type_integrated_v1_parsed', 'cell_type_parsed', 'low_q'],
-    'uns':['cell_type_integrated_v1_colors', 
-           'cell_type_integrated_v1_parsed_order', 
+           'study_parsed', 'cell_type_integrated_v2_parsed', 'cell_type_parsed', 'low_q'],
+    'uns':['cell_type_integrated_v2_colors', 
+           'cell_type_integrated_v2_parsed_order', 
            'study_order', 
            'study_parsed_colors', 'study_parsed_order'],
     'obsm':['X_integrated', 'X_umap'],
@@ -258,7 +258,6 @@ meta['uns']
 meta['obsm']
 
 # %%
-# make uns descriptions
 meta['uns']['field_descriptions']={
     'readme':'The field description dictionary contains adata field explanations. '+\
               'Fields prefixed with "BETA-DATA" come from beta-cell specific adata object '+\
@@ -320,8 +319,8 @@ meta['uns']['field_descriptions']={
             'set to a single annotation that can be jointly filtered out.',
         'cell_type': 'Per-dataset annotation of cell types used for integartion evaluation. '+\
             'Unnanotated cells start with NA.',
-        'cell_type_integrated_v1': 'Cell type reannotation on the integrated atlas.',
-        'cell_type_integrated_v1_parsed': 'As cell_type_integrated_v1, but with pretty names.'+\
+        'cell_type_integrated_v2': 'Cell type reannotation on the integrated atlas.',
+        'cell_type_integrated_v2_parsed': 'As cell_type_integrated_v2, but with pretty names.'+\
             'Abbreviations: E - embryonic, endo. - endocrine, "+"" symbol - likely doublet, '+\
             'prolif. - proliferative, lowQ - low quality, '+\
             'stellate a./q. - stellate activated/quiescent',

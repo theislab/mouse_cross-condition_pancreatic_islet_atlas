@@ -61,7 +61,7 @@ cols=['study_sample', 'study_parsed', 'file', 'design',
       'ins_high', 'gcg_high','sst_high', 'ppy_high', 
       'cell_filtering', 'strain', 'age', 
       'pre_cell_type_unified','pre_cell_type_original',
-      'cell_type_integrated_v1_parsed','low_q']
+      'cell_type_integrated_v2_parsed','low_q']
 # Other cols to add parsed latter for CZI: 'tissue', 'technique', 
 # Other colls to be parsed: 'cell_type_multiplet', 
 obs=obs_a[cols].copy()
@@ -72,7 +72,7 @@ cols_rename={
     'phase_cyclone':'cell_cycle_phase',
     'pre_cell_type_original':'cell_type_originalDataset',
     'pre_cell_type_unified':'cell_type_originalDataset_unified',
-    'cell_type_integrated_v1_parsed':'cell_type_reannotatedIntegrated'
+    'cell_type_integrated_v2_parsed':'cell_type_reannotatedIntegrated'
 }
 obs.rename(cols_rename,axis=1,inplace=True)
 obs.columns.to_list()
@@ -88,7 +88,7 @@ if False:
     obs['dataset']=obs_a['study_parsed']
     obs['cell_type_originalDataset']=obs_a['pre_cell_type_original']
     obs['cell_type_originalDataset_unified']=obs_a['pre_cell_type_unified']
-    obs['cell_type_reannotatedIntegrated']=obs_a['cell_type_integrated_v1_parsed']
+    obs['cell_type_reannotatedIntegrated']=obs_a['cell_type_integrated_v2_parsed']
 
 # %%
 # Convert to category
@@ -322,7 +322,7 @@ obs['assay_ontology_term_id']=obs_a['technique'].map({
     'Chromium v3.1':'EFO:0009922'}).astype('category')
 
 # %%
-obs['cell_type_ontology_term_id']=obs_a['cell_type_integrated_v1'].map({
+obs['cell_type_ontology_term_id']=obs_a['cell_type_integrated_v2'].map({
      'acinar':'CL:0002064',
      'alpha':'CL:0000171',
      'alpha_beta':'CL:0008024',

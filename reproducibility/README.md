@@ -29,7 +29,7 @@ Integration:
   - 6.1: scVI - select hyperparams on ref data and then train model on whole data, including different ambient preprocessing (integration/scVI/6-1*)
   - 6.2: scArches - select hyperparams on ref data and then train model on whole data, including different ambient preprocessing or using only beta cell subset (integration/scVI/6-2* scArches). 
   - We also tried maping the non-ref data subset (external or diabetic samples) to the selected best ref subset integration (only non-diabetic in house samples), but the reference mapping performance was never of comparable quality to de novo integration of all datasets, possibly due to low complexity of the reference (the ref dataset). The code for mapping on top of the ref integration is in 6-2-2_scArches_addToRef.ipynb, however, we do not show the scIB results in the evaluation summary plots (described below) as this was not used in the paper due to the above mentioned poor performance.
-  - 6.3: Evaluation with scIB metrics - compute evaluation metrics on different data subsets (e.g. all cells, annotated cells, beta cells) and compare results across integration runs (integration/6-3*)
+  - 6.3: Evaluation with scIB metrics - compute evaluation metrics on different data subsets (e.g. all cells, annotated cells, beta cells) and compare results across integration runs (integration/6-3*). The moransi_conservation function used in integration_eval_helper.py is supplied in a separate file (moransi_conservation.py) rather than the scIB package.
  - 6.4: Prepare integrated adata
    - 6.4.1: Comparison of gene annotation across datasets needed to merge all samples into a single adata (preprocessing/6-4-1*)
    - 6.4.2: Merge datasets into a single integrated object (integration/6-4-2*)
@@ -51,6 +51,7 @@ Atlas-level analyses of integrated data:
   - 12.2: Comparison of postnatal and embryonic markers (data_exploration/atlas/12-2*)
 - 13: Embedding localisation of endocrine embryonic and postnatal cells. Analysis of why embryonic delta cells are mapping to the postnatal region of the integrated embedding. (data_exploration/atlas/13*)
 - 14: DE in T1D and T2D in endocrine cell types (data_exploration/atlas/14*)
+- 27: Unintegrated embedding for comparison to the integrated atlas (data_exploration/atlas/27*)
 
 Beta cell specific analyses of integrated data:
 - 15: Gene information for prioritisation of genes during beta cell analyses interpretation
@@ -72,7 +73,8 @@ Beta cell specific analyses of integrated data:
 - 19: Variance in data explained by GPs and healthy conserved gene groups
   - 19.1: Variance explained by GPs across datasets, including additional datasets not included in the atlas (data_exploration/atlas/beta/19-1*)
   - 19.2: Healthy-samples (including samples outside of the atlas) variance explained by GPs that are likely related to differences between health and disease (data_exploration/atlas/beta/19-2*)
-  - 19.3: Groups of genes consistently co-variable across healthy samples (data_exploration/atlas/beta/19-3*)
+  - 19.3: Groups of genes consistently co-variable across healthy adult samples (data_exploration/atlas/beta/19-3*)
+  - 19.4: Embedding localisation of cells high for groups of genes consistently co-variable across healthy adult samples and healthy adult query cells (data_exploration/atlas/beta/19-4*)
 - 20: Comparison of diabetic models
   - 20.1: Simialrity of diabetes models to human data - find gene sets DE in human diabetes (based on scRNA-seq human data and literature) and compare their expression between healthy and diabetic samples from diabetes model datasets (data_exploration/atlas/beta/20-1*)
   - 20.2: Expression of known function and stress genes across diabetes models (data_exploration/atlas/beta/20-2*)
@@ -87,6 +89,7 @@ Beta cell specific analyses of integrated data:
 - 22: Sex differences
   - 22.1: DE between sexes per study (data_exploration/atlas/beta/22-1*)
   - 22.2: Analyse and cluster DE genes in the aged dataset (data_exploration/atlas/beta/22-2*)
+- 26: Fltp expression in Fltp-reporter sorted samples (data_exploration/atlas/beta/26*)
 
 Atlas reference mapping
 - 23: Mapping of external mouse dataset to the atlas
@@ -94,7 +97,9 @@ Atlas reference mapping
   - 23.2: Joint embedding of the atlas and the external mouse dataset with cell state transfer (data_exploration/atlas/beta/23-2*)
 
 Prepare data for submission
-- 24: Prepare certain tables for paper and supplements that require combining and editing of multiple previously generated tables. Some tables were prepared manualy or directly in other files and are thus not edited here. (prepare_submit/24*)
+- 24: Prepare tables:
+  - 24.1: Prepare certain tables for paper and supplements that require combining and editing of multiple previously generated tables. Some tables were prepared manualy or directly in other files and are thus not edited here. (prepare_submit/24-1*)
+  - 24.2: Cell type and subtype counts accross samples (prepare_submit/24-2*)
 - 25: Anndata objects
   - 25.1: Atlas adata for cellxgene (prepare_submit/25-1*)
   - 25.2: Atlas adata for GEO (prepare_submit/25-2*)

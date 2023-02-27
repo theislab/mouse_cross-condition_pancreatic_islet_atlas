@@ -8,6 +8,7 @@ from scib.metrics.clustering import opt_louvain
 from scib.metrics.utils import NeighborsError
 import scib.metrics as sm
 from matplotlib import rcParams
+# Use instead moransi_conservation from moransi_conservation.py
 import scib.metrics.moransi_conservation as smmc
 
 def compute_metrics(adata_full,latent_adata,metrics,
